@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  A fast glob engine for Node.js. Patterns, brace expansion, extended globs, ignore rules.
+  A friendly glob engine for Node.js. Patterns, brace expansion, extended globs, ignore rules.
 </p>
 
 

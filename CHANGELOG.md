@@ -3,7 +3,7 @@
 ## [1.2.0] - 2026-07-14
 
 ### Added
-- `concurrency` option — controls parallelism of directory traversal. Default `1` (serial). Set higher (e.g., `16`, `64`) to improve performance on SSDs and network filesystems.
+- `concurrency` option - controls parallelism of directory traversal. Default `1` (serial). Set higher (e.g., `16`, `64`) to improve performance on SSDs and network filesystems.
 
 ## [1.1.0] - 2026-07-14
 
@@ -12,8 +12,8 @@
 - `globStream()` - async generator that yields matching paths as they are discovered, without buffering all results in memory
 - `nosort` option - skip result sorting for improved performance on large sets
 - `nounique` option - preserve duplicate paths in results
-- Public export of `matchPath()`, `matchGlob()`, `parsePattern()`, and `expandPatterns()` for advanced use cases
-- `MatchOptions` type exported for use with `matchPath()` and `matchGlob()`
+- Public export of `matchPath()`, `parsePattern()`, and `expandPatterns()` for advanced use cases
+- `MatchOptions` type exported for use with `matchPath()`
 
 ## [1.0.1] - 2026-07-14
 

@@ -49,7 +49,6 @@ function matchSegment(
           return matchSegment(segment.slice(si), nodes.slice(ni + 1), options);
         }
       } else {
-        if (!options.dot && si === 0 && segment.startsWith(".") && segment !== "." && segment !== "..") return false;
         si = segment.length;
         ni++;
       }
@@ -70,8 +69,6 @@ function matchSegment(
         segment, si, node.kind, node.alternatives,
         nodes.slice(ni + 1), options
       );
-    } else if (node.type === "globstar") {
-      ni++;
     } else {
       ni++;
     }
@@ -243,6 +240,8 @@ function matchPathSegments(
     }
     return false;
   }
+
+  if (currentPatternNodes.length === 0) return false;
 
   const seg = pathSegments[si];
 
