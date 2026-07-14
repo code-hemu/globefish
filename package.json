@@ -1,0 +1,61 @@
+{
+  "name": "globefish",
+  "version": "1.0.1",
+  "description": "A friendly glob engine for Node.js.",
+  "type": "module",
+  "author": "Hemanta Gayen",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "docs",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "npm run clean && tsc",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "bench": "vitest bench",
+    "lint": "eslint src",
+    "format": "prettier --write src",
+    "prepublishOnly": "npm run build",
+    "clean": "remove-item dist -r -f"
+  },
+  "keywords": [
+    "glob",
+    "globbing",
+    "glob-engine",
+    "file-matching",
+    "pattern-matching",
+    "filesystem",
+    "nodejs",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/code-hemu/globefish"
+  },
+  "bugs": {
+    "url": "https://github.com/code-hemu/globefish/issues"
+  },
+  "homepage": "https://github.com/code-hemu/globefish#readme",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "remove-item": "^1.0.2",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^3.0.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.0.0"
+  }
+}
