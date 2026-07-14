@@ -81,6 +81,7 @@ export async function* walkTree(
 
         if (isDir && depth + 1 <= opts.maxDepth) {
           queue.push({ dir: fullPath, depth: depth + 1 });
+          dispatch();
         }
       }
     } catch (err) {
@@ -89,9 +90,7 @@ export async function* walkTree(
       return;
     } finally {
       activeWorkers--;
-      if (activeWorkers === 0) {
-        dispatch();
-      }
+      dispatch();
     }
   };
 

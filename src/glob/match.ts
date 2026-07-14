@@ -45,8 +45,6 @@ function matchSegment(
         } else if (nextNode.type === "qmark" || nextNode.type === "charclass") {
           if (tryStarSplit(segment, si, nodes, ni, options)) return true;
           return false;
-        } else if (nextNode.type === "separator") {
-          return matchSegment(segment.slice(si), nodes.slice(ni + 1), options);
         } else {
           return matchSegment(segment.slice(si), nodes.slice(ni + 1), options);
         }
@@ -189,21 +187,18 @@ function matchPathSegments(
 
   // Check if current pattern segment is a globstar (possibly with trailing separator)
   let isGlobstar = false;
-  let pureGlobstarNodes: PatternNode[] = [];
 
   if (
     currentPatternNodes.length === 1 &&
     currentPatternNodes[0].type === "globstar"
   ) {
     isGlobstar = true;
-    pureGlobstarNodes = currentPatternNodes;
   } else if (
     currentPatternNodes.length >= 2 &&
     currentPatternNodes[0].type === "globstar" &&
     currentPatternNodes[1].type === "separator"
   ) {
     isGlobstar = true;
-    pureGlobstarNodes = currentPatternNodes.slice(0, 2);
   } else if (
     currentPatternNodes.length >= 1 &&
     currentPatternNodes[0].type === "separator" &&
@@ -211,7 +206,6 @@ function matchPathSegments(
     currentPatternNodes[1].type === "globstar"
   ) {
     isGlobstar = true;
-    pureGlobstarNodes = currentPatternNodes.slice(0, 2);
   }
 
   if (isGlobstar) {
@@ -307,13 +301,3 @@ export function matchPath(
   return matchPathSegments(pathSegments, patternSegments, options);
 }
 
-export function matchGlob(
-  path: string,
-  patterns: string[],
-  options: MatchOptions = {}
-): boolean {
-  for (const pattern of patterns) {
-    if (matchPath(path, pattern, options)) return true;
-  }
-  return false;
-}

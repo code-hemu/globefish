@@ -12,9 +12,3 @@ export class PatternSyntaxError extends GlobError {
   }
 }
 
-export class WalkError extends GlobError {
-  constructor(message: string) {
-    super(message);
-    this.name = "WalkError";
-  }
-}

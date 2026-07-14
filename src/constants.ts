@@ -1,11 +1,7 @@
 import type { GlobOptions } from "./types/index.js";
 
-function getDefaultCwd(): string {
-  return process.cwd();
-}
-
 export const DEFAULT_OPTIONS: Required<GlobOptions> = {
-  get cwd() { return getDefaultCwd(); },
+  get cwd() { return process.cwd(); },
   ignore: [],
   absolute: false,
   dot: false,

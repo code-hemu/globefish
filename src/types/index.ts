@@ -1,5 +1,3 @@
-import type { Dirent } from "node:fs";
-
 export type GlobOptions = {
   cwd?: string;
   ignore?: string[];
@@ -13,11 +11,6 @@ export type GlobOptions = {
   nosort?: boolean;
   nounique?: boolean;
   concurrency?: number;
-};
-
-export type GlobEntry = {
-  path: string;
-  dirent?: Dirent;
 };
 
 export type PatternNode =

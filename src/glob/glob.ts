@@ -72,12 +72,13 @@ export async function glob(
   pattern: string | string[],
   options: GlobOptions = {}
 ): Promise<string[]> {
+  const opts = { ...DEFAULT_OPTIONS, ...options } as Required<GlobOptions>;
   const results: string[] = [];
   for await (const r of globStream(pattern, options)) {
     results.push(r);
   }
-  let result = options?.nounique ? results : [...new Set(results)];
-  if (!options?.nosort) {
+  let result = opts.nounique ? results : [...new Set(results)];
+  if (!opts.nosort) {
     result.sort();
   }
   return result;

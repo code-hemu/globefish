@@ -14,6 +14,12 @@ export class Ignorer {
 
     for (const rule of this.rules) {
       if (rule.anchored) {
+        if (rule.dirOnly && !isDir) {
+          if (path.startsWith(rule.pattern + "/")) {
+            ignored = !rule.negate;
+          }
+          continue;
+        }
         const matches = path === rule.pattern || path.startsWith(rule.pattern + "/");
         if (matches) ignored = !rule.negate;
         continue;

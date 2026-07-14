@@ -35,4 +35,11 @@ describe("Ignorer", () => {
     expect(ignorer.ignores("foo.ts", false)).toBe(true);
     expect(ignorer.ignores("important.ts", false)).toBe(false);
   });
+
+  it("anchored dirOnly rule does not match files", () => {
+    const ignorer = new Ignorer(["/build/"]);
+    expect(ignorer.ignores("build", false)).toBe(false);
+    expect(ignorer.ignores("build", true)).toBe(true);
+    expect(ignorer.ignores("build/file.ts", false)).toBe(true);
+  });
 });

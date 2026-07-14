@@ -130,18 +130,6 @@ const files = await glob("**/*.ts", { concurrency: 16 });
 Higher concurrency is not always better - it depends on your storage device and the directory structure. Experiment with values between `4` and `64` to find the sweet spot.
 
 
-## `GlobEntry`
-
-```ts
-type GlobEntry = {
-  path: string;
-  dirent?: Dirent;
-};
-```
-
-Reserved for a future streaming/event-based API. The `glob()` function currently returns `string[]`.
-
-
 ## Pattern Syntax
 
 ### Literals
@@ -267,7 +255,7 @@ Ignore pattern rules:
 The package exports typed error classes that can be caught with `instanceof`:
 
 ```ts
-import { GlobError, PatternSyntaxError, WalkError } from "globefish";
+import { GlobError, PatternSyntaxError } from "globefish";
 
 try {
   await glob("{unclosed");
@@ -280,7 +268,6 @@ try {
 
 - **`GlobError`** - Base error for all glob-related errors
 - **`PatternSyntaxError`** - Thrown when a pattern has invalid syntax (unclosed braces, unclosed char classes, unclosed extglob groups)
-- **`WalkError`** - Filesystem walk errors (reserved, not currently thrown)
 
 
 ## Examples
@@ -336,17 +323,6 @@ import { matchPath } from "globefish";
 matchPath("src/index.ts", "src/*.ts");      // true
 matchPath("src/index.ts", "src/*.js");      // false
 matchPath(".git/config", "**/*", { dot: true }); // true
-```
-
-### `matchGlob(path, patterns, options?)`
-
-Returns `true` if `path` matches any of the given patterns.
-
-```ts
-import { matchGlob } from "globefish";
-
-matchGlob("a.ts", ["*.ts", "*.js"]);  // true
-matchGlob("a.css", ["*.ts", "*.js"]); // false
 ```
 
 ### `parsePattern(pattern)`
