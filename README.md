@@ -27,7 +27,9 @@
 - **Glob-level negation** - prefix any pattern with `!` to exclude matching paths from the final result set
 - **Ignore rules** - pass `.gitignore`-style patterns via the `ignore` option for declarative, familiar exclusion rules
 - **Escape sequences** - `\*`, `\{`, and other backslash escapes let you match literal special characters without ambiguity
-- **Async API** - every `glob()` call returns a `Promise<string[]>`, fitting naturally into modern async/await workflows
+- **Async API** - `glob()` returns a `Promise<string[]>` for modern async/await workflows
+- **Sync API** - `globSync()` provides a synchronous alternative when async is not suitable
+- **Streaming API** - `globStream()` yields results as they are discovered, without buffering all results in memory
 
 
 ## Installation

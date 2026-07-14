@@ -14,4 +14,6 @@ export const DEFAULT_OPTIONS: Required<GlobOptions> = {
   onlyFiles: false,
   onlyDirectories: false,
   markDirectories: false,
+  nosort: false,
+  nounique: false,
 };

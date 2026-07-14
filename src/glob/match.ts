@@ -6,6 +6,7 @@ export interface MatchOptions {
   dot?: boolean;
 }
 
+
 function matchSegment(
   segment: string,
   nodes: PatternNode[],

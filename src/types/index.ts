@@ -10,6 +10,8 @@ export type GlobOptions = {
   onlyFiles?: boolean;
   onlyDirectories?: boolean;
   markDirectories?: boolean;
+  nosort?: boolean;
+  nounique?: boolean;
 };
 
 export type GlobEntry = {

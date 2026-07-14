@@ -33,6 +33,50 @@ function glob(
 
 ---
 
+## `globSync(patterns, options?)`
+
+Synchronous version of `glob()`. Uses synchronous filesystem operations.
+
+```ts
+import { globSync } from "globefish";
+
+const files = globSync("src/**/*.ts");
+```
+
+### Signature
+
+```ts
+function globSync(
+  patterns: string | string[],
+  options?: GlobOptions
+): string[];
+```
+
+---
+
+## `globStream(patterns, options?)`
+
+Streaming version of `glob()`. Yields matching paths as they are discovered, without buffering all results in memory.
+
+```ts
+import { globStream } from "globefish";
+
+for await (const file of globStream("src/**/*.ts")) {
+  processFile(file); // handle each result as it arrives
+}
+```
+
+### Signature
+
+```ts
+function globStream(
+  patterns: string | string[],
+  options?: GlobOptions
+): AsyncGenerator<string>;
+```
+
+---
+
 ## `GlobOptions`
 
 ```ts
@@ -46,6 +90,8 @@ type GlobOptions = {
   onlyFiles?: boolean;
   onlyDirectories?: boolean;
   markDirectories?: boolean;
+  nosort?: boolean;
+  nounique?: boolean;
 };
 ```
 
@@ -60,10 +106,20 @@ type GlobOptions = {
 | `onlyFiles` | `boolean` | `false` | When `true`, only files (not directories) are returned. |
 | `onlyDirectories` | `boolean` | `false` | When `true`, only directories are returned. |
 | `markDirectories` | `boolean` | `false` | When `true`, directory paths are suffixed with `/`. |
+| `nosort` | `boolean` | `false` | When `true`, result paths are returned in filesystem discovery order instead of sorted alphabetically. |
+| `nounique` | `boolean` | `false` | When `true`, duplicate paths are not removed from results. |
 
 ### `onlyFiles` / `onlyDirectories`
 
 These two options are mutually exclusive in practice. If both are `true`, `onlyDirectories` takes precedence.
+
+### `nosort`
+
+By default, results are sorted alphabetically. Setting `nosort: true` skips sorting, which can improve performance on large result sets.
+
+### `nounique`
+
+By default, duplicate paths are removed. Setting `nounique: true` preserves duplicates, which may occur when multiple patterns match the same file.
 
 ---
 
@@ -252,4 +308,65 @@ const sourceFiles = await glob("**/*.{ts,js}", {
 
 // Only directories
 const dirs = await glob("src/**", { onlyDirectories: true });
+
+// Sync usage
+const syncFiles = globSync("src/**/*.ts");
+
+// Stream usage
+for await (const file of globStream("**/*.ts", { ignore: ["node_modules/**"] })) {
+  console.log(file);
+}
+```
+
+---
+
+## Low-level APIs
+
+These functions are exported for advanced use cases but are used internally by `glob()`.
+
+### `matchPath(path, pattern, options?)`
+
+Returns `true` if `path` matches the given glob `pattern`.
+
+```ts
+import { matchPath } from "globefish";
+
+matchPath("src/index.ts", "src/*.ts");      // true
+matchPath("src/index.ts", "src/*.js");      // false
+matchPath(".git/config", "**/*", { dot: true }); // true
+```
+
+### `matchGlob(path, patterns, options?)`
+
+Returns `true` if `path` matches any of the given patterns.
+
+```ts
+import { matchGlob } from "globefish";
+
+matchGlob("a.ts", ["*.ts", "*.js"]);  // true
+matchGlob("a.css", ["*.ts", "*.js"]); // false
+```
+
+### `parsePattern(pattern)`
+
+Parses a glob pattern string into an array of `PatternNode` tokens. Throws `PatternSyntaxError` on invalid syntax.
+
+```ts
+import { parsePattern } from "globefish";
+
+const nodes = parsePattern("src/**/*.ts");
+// [{ type: "literal", value: "src" }, { type: "separator" },
+//  { type: "globstar" }, { type: "separator" },
+//  { type: "star" }, { type: "literal", value: ".ts" }]
+```
+
+### `expandPatterns(patterns)`
+
+Performs brace expansion on one or more patterns. Returns an array of expanded strings.
+
+```ts
+import { expandPatterns } from "globefish";
+
+expandPatterns("{a,b}/{1,2}"); // ["a/1", "a/2", "b/1", "b/2"]
+expandPatterns(["*.{ts,js}", "*.css"]); // ["*.ts", "*.js", "*.css"]
 ```
