@@ -1,0 +1,8 @@
+src
+tests
+benchmarks
+tsconfig.json
+.gitignore
+.gitattributes
+.github
+node_modules

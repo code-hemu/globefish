@@ -16,24 +16,24 @@
   <a href="https://github.com/sponsors/code-hemu"><img src="https://img.shields.io/badge/Sponsor-GitHub-red" alt="Sponsor"></a>
 </p>
 
-
+<h1 align="center">globefish</h1>
 
 <p align="center">
   A fast, full-featured glob engine for Node.js.<br />
-  Patterns, brace expansion, extended globs, ignore rules - all in one zero-dependency package.
+  Patterns, brace expansion, extended globs, ignore rules — all in one zero-dependency package.
 </p>
 
 ## Features
 
-- **Glob patterns** - `*`, `**`, `?`, `[abc]`, `[!abc]`, `[^abc]`
-- **Brace expansion** - `{a,b}`, nested braces, empty alternatives
-- **Extended globs** - `?(...)`, `*(...)`, `+(...)`, `@(...)`, `!(...)`
-- **Glob-level negation** - `!pattern` to exclude from results
-- **Ignore rules** - `.gitignore`-style filtering via the `ignore` option
-- **Escape sequences** - `\*`, `\{`, etc. for literal special chars
-- **Async API** - returns `Promise<string[]>`
-- **TypeScript** - first-class types with full `GlobOptions`
-- **Zero dependencies** - pure Node.js, no runtime deps
+- **Glob patterns** — `*`, `**`, `?`, `[abc]`, `[!abc]`, `[^abc]`
+- **Brace expansion** — `{a,b}`, nested braces, empty alternatives
+- **Extended globs** — `?(...)`, `*(...)`, `+(...)`, `@(...)`, `!(...)`
+- **Glob-level negation** — `!pattern` to exclude from results
+- **Ignore rules** — `.gitignore`-style filtering via the `ignore` option
+- **Escape sequences** — `\*`, `\{`, etc. for literal special chars
+- **Async API** — returns `Promise<string[]>`
+- **TypeScript** — first-class types with full `GlobOptions`
+- **Zero dependencies** — pure Node.js, no runtime deps
 
 ## Installation
 
@@ -63,7 +63,7 @@ const absolute = await glob("**/*.ts", { cwd: "./src", absolute: true });
 
 | Param | Type | Default | Description |
 |---|---|---|---|
-| `patterns` | `string \| string[]` | - | One or more glob patterns. Leading `!` negates. |
+| `patterns` | `string \| string[]` | — | One or more glob patterns. Leading `!` negates. |
 | `options.cwd` | `string` | `process.cwd()` | Working directory |
 | `options.ignore` | `string[]` | `[]` | `.gitignore`-style ignore patterns |
 | `options.absolute` | `boolean` | `false` | Return absolute paths |
@@ -108,7 +108,7 @@ npm install
 npm test             # run tests
 npm run test:coverage # run tests with coverage
 npm run bench        # run benchmarks
-npm run build   # compile TypeScript
+npm run build        # compile TypeScript
 ```
 
 PRs and issues welcome at [github.com/code-hemu/globefish](https://github.com/code-hemu/globefish).
