@@ -3,11 +3,7 @@
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/code-hemu/globefish/refs/heads/main/resources/light_logo.png" />
       <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/code-hemu/globefish/refs/heads/main/resources/dark_logo.png" />
-<<<<<<< Updated upstream
       <img src="https://raw.githubusercontent.com/code-hemu/globefish/refs/heads/main/resources/dark_logo.png" alt="globefish logo" width="500px" />
-=======
-      <img src="https://raw.githubusercontent.com/code-hemu/globefish/refs/heads/main/resources/dark_logo.png" alt="globefish logo" width="100%" />
->>>>>>> Stashed changes
     </picture>
   </a>
 </p>
