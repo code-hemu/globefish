@@ -62,19 +62,6 @@ The primary entry point. Accepts one or more glob patterns and an optional confi
 function glob(patterns: string | string[], options?: GlobOptions): Promise
 ```
 
-| Param | Type | Default | Description |
-|---|---|---|---|
-| `patterns` | `string \| string[]` |   | One or more glob patterns to match against the filesystem. A leading `!` on any pattern negates it, excluding those paths from results. |
-| `options.cwd` | `string` | `process.cwd()` | The directory from which patterns are resolved. All returned paths are relative to this unless `absolute` is set. |
-| `options.ignore` | `string[]` | `[]` | A list of `.gitignore`-style patterns. Any path matching an ignore pattern is excluded from results, regardless of what the main patterns match. |
-| `options.absolute` | `boolean` | `false` | When `true`, returned paths are absolute rather than relative to `cwd`. |
-| `options.dot` | `boolean` | `false` | When `true`, patterns can match files and directories whose names begin with `.` (dotfiles). By default, dotfiles are hidden from results. |
-| `options.followSymlinks` | `boolean` | `true` | When `true`, symbolic links are followed during directory traversal. Set to `false` to treat symlinks as opaque entries and avoid following them. |
-| `options.maxDepth` | `number` | `Infinity` | Limits how many directory levels deep the traversal descends. A value of `1` matches only direct children of `cwd`. |
-| `options.onlyFiles` | `boolean` | `false` | When `true`, only regular files are included in results. Directories matched by a pattern are silently dropped. |
-| `options.onlyDirectories` | `boolean` | `false` | When `true`, only directories are included in results. Cannot be combined with `onlyFiles`. |
-| `options.markDirectories` | `boolean` | `false` | When `true`, directory paths in the result set are suffixed with a trailing `/`, making it easy to distinguish them from files without a separate `stat` call. |
-
 > Full API reference including advanced pattern syntax details, error handling behaviour, and edge cases: [`docs/api.md`](docs/api.md)
 
 ## Pattern Syntax
