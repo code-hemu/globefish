@@ -1,12 +1,17 @@
 # Changelog
 
+## [1.2.0] - 2026-07-14
+
+### Added
+- `concurrency` option — controls parallelism of directory traversal. Default `1` (serial). Set higher (e.g., `16`, `64`) to improve performance on SSDs and network filesystems.
+
 ## [1.1.0] - 2026-07-14
 
 ### Added
-- `globSync()` — synchronous version of `glob()` for use when async is not suitable
-- `globStream()` — async generator that yields matching paths as they are discovered, without buffering all results in memory
-- `nosort` option — skip result sorting for improved performance on large sets
-- `nounique` option — preserve duplicate paths in results
+- `globSync()` - synchronous version of `glob()` for use when async is not suitable
+- `globStream()` - async generator that yields matching paths as they are discovered, without buffering all results in memory
+- `nosort` option - skip result sorting for improved performance on large sets
+- `nounique` option - preserve duplicate paths in results
 - Public export of `matchPath()`, `matchGlob()`, `parsePattern()`, and `expandPatterns()` for advanced use cases
 - `MatchOptions` type exported for use with `matchPath()` and `matchGlob()`
 
@@ -18,7 +23,7 @@
 - Glob-level negation via leading `!` prefix
 - Ignore rules via `.gitignore`-style patterns in `ignore` option
 - Escape sequences for literal special characters
-- Async API — `glob()` returns `Promise<string[]>`
+- Async API - `glob()` returns `Promise<string[]>`
 - Full POSIX character class support (`[abc]`, `[!abc]`, `[^abc]`)
 - Option flags: `cwd`, `absolute`, `dot`, `followSymlinks`, `maxDepth`, `onlyFiles`, `onlyDirectories`, `markDirectories`
 - File system walker with configurable depth and symlink handling

@@ -14,39 +14,52 @@ export async function* walkTree(
   cwd: string,
   options: GlobOptions = {}
 ): AsyncGenerator<WalkEntry> {
-  const opts = { ...DEFAULT_OPTIONS, ...options };
+  const opts = { ...DEFAULT_OPTIONS, ...options } as Required<GlobOptions>;
   const normalizedCwd = normalizePath(cwd);
   const queue: { dir: string; depth: number }[] = [{ dir: cwd, depth: 0 }];
   const caseSensitive = process.platform !== "win32";
   const visited = new Set<string>();
+  const buffer: WalkEntry[] = [];
+  let notify: (() => void) | null = null;
+  let activeWorkers = 0;
+  let workerError: unknown = null;
 
-  while (queue.length > 0) {
-    const { dir, depth } = queue.shift()!;
+  const dispatch = (): void => {
+    while (queue.length > 0 && activeWorkers < opts.concurrency) {
+      const item = queue.shift()!;
+      if (item.depth > opts.maxDepth) continue;
+      activeWorkers++;
+      workerFor(item.dir, item.depth);
+    }
+    if (activeWorkers === 0) {
+      notify?.();
+    }
+  };
 
-    if (depth > opts.maxDepth) continue;
-
-    let dirents: WalkEntry[] = [];
+  const workerFor = async (dir: string, depth: number): Promise<void> => {
     try {
-      const entries = await readdir(dir);
+      let entries;
+      try {
+        entries = await readdir(dir);
+      } catch (err: unknown) {
+        const code = (err as NodeJS.ErrnoException)?.code;
+        if (code !== "EACCES" && code !== "EPERM" && code !== "ENOTDIR") throw err;
+        return;
+      }
+
       for (const dirent of entries) {
         const fullPath = join(dir, dirent.name);
-        const normalizedPath = normalizePath(fullPath);
+        const fullNormalized = normalizePath(fullPath);
 
-        const visitedKey = caseSensitive ? normalizedPath : normalizedPath.toLowerCase();
+        const visitedKey = caseSensitive ? fullNormalized : fullNormalized.toLowerCase();
         if (visited.has(visitedKey)) continue;
         visited.add(visitedKey);
 
-        let relativePath = normalizedPath;
-        if (pathStartsWith(normalizedPath, normalizedCwd)) {
-          const after = normalizedPath.slice(normalizedCwd.length);
+        let relativePath = fullNormalized;
+        if (pathStartsWith(fullNormalized, normalizedCwd)) {
+          const after = fullNormalized.slice(normalizedCwd.length);
           relativePath = after.startsWith("/") ? after.slice(1) : after;
         }
-
-        const entry: WalkEntry = {
-          path: relativePath || normalizedPath,
-          dirent,
-          depth: depth + 1,
-        };
 
         let isDir = dirent.isDirectory();
         if (dirent.isSymbolicLink() && opts.followSymlinks) {
@@ -58,16 +71,50 @@ export async function* walkTree(
           }
         }
 
-        yield entry;
+        buffer.push({
+          path: relativePath || fullNormalized,
+          dirent,
+          depth: depth + 1,
+        });
+
+        notify?.();
 
         if (isDir && depth + 1 <= opts.maxDepth) {
           queue.push({ dir: fullPath, depth: depth + 1 });
         }
       }
-    } catch (err: unknown) {
-      const code = (err as NodeJS.ErrnoException)?.code;
-      if (code !== "EACCES" && code !== "EPERM" && code !== "ENOTDIR") throw err;
+    } catch (err) {
+      workerError = err;
+      notify?.();
+      return;
+    } finally {
+      activeWorkers--;
+      if (activeWorkers === 0) {
+        dispatch();
+      }
     }
+  };
+
+  dispatch();
+
+  while (true) {
+    while (buffer.length > 0) {
+      yield buffer.shift()!;
+    }
+    if (workerError) throw workerError;
+    if (activeWorkers === 0) break;
+
+    const ready = new Promise<void>((resolve) => {
+      notify = resolve;
+    });
+
+    if (buffer.length > 0 || activeWorkers === 0) {
+      notify = null;
+      continue;
+    }
+
+    await ready;
+    notify = null;
   }
 }
 
@@ -75,59 +122,58 @@ export function* walkTreeSync(
   cwd: string,
   options: GlobOptions = {}
 ): Generator<WalkEntry> {
-  const opts = { ...DEFAULT_OPTIONS, ...options };
+  const opts = { ...DEFAULT_OPTIONS, ...options } as Required<GlobOptions>;
   const normalizedCwd = normalizePath(cwd);
   const queue: { dir: string; depth: number }[] = [{ dir: cwd, depth: 0 }];
   const caseSensitive = process.platform !== "win32";
   const visited = new Set<string>();
 
   while (queue.length > 0) {
-    const { dir, depth } = queue.shift()!;
+    const item = queue.shift()!;
+    if (item.depth > opts.maxDepth) continue;
 
-    if (depth > opts.maxDepth) continue;
-
-    let dirents: WalkEntry[] = [];
+    let entries;
     try {
-      const entries = readdirSync(dir);
-      for (const dirent of entries) {
-        const fullPath = join(dir, dirent.name);
-        const normalizedPath = normalizePath(fullPath);
-
-        const visitedKey = caseSensitive ? normalizedPath : normalizedPath.toLowerCase();
-        if (visited.has(visitedKey)) continue;
-        visited.add(visitedKey);
-
-        let relativePath = normalizedPath;
-        if (pathStartsWith(normalizedPath, normalizedCwd)) {
-          const after = normalizedPath.slice(normalizedCwd.length);
-          relativePath = after.startsWith("/") ? after.slice(1) : after;
-        }
-
-        const entry: WalkEntry = {
-          path: relativePath || normalizedPath,
-          dirent,
-          depth: depth + 1,
-        };
-
-        let isDir = dirent.isDirectory();
-        if (dirent.isSymbolicLink() && opts.followSymlinks) {
-          try {
-            const targetStat = statSync(fullPath);
-            isDir = targetStat.isDirectory();
-          } catch {
-            isDir = false;
-          }
-        }
-
-        yield entry;
-
-        if (isDir && depth + 1 <= opts.maxDepth) {
-          queue.push({ dir: fullPath, depth: depth + 1 });
-        }
-      }
+      entries = readdirSync(item.dir);
     } catch (err: unknown) {
       const code = (err as NodeJS.ErrnoException)?.code;
       if (code !== "EACCES" && code !== "EPERM" && code !== "ENOTDIR") throw err;
+      continue;
+    }
+
+    for (const dirent of entries) {
+      const fullPath = join(item.dir, dirent.name);
+      const fullNormalized = normalizePath(fullPath);
+
+      const visitedKey = caseSensitive ? fullNormalized : fullNormalized.toLowerCase();
+      if (visited.has(visitedKey)) continue;
+      visited.add(visitedKey);
+
+      let relativePath = fullNormalized;
+      if (pathStartsWith(fullNormalized, normalizedCwd)) {
+        const after = fullNormalized.slice(normalizedCwd.length);
+        relativePath = after.startsWith("/") ? after.slice(1) : after;
+      }
+
+      let isDir = dirent.isDirectory();
+      if (dirent.isSymbolicLink() && opts.followSymlinks) {
+        try {
+          const targetStat = statSync(fullPath);
+          isDir = targetStat.isDirectory();
+        } catch {
+          isDir = false;
+        }
+      }
+
+      yield {
+        path: relativePath || fullNormalized,
+        dirent,
+        depth: item.depth + 1,
+      };
+
+      if (isDir && item.depth + 1 <= opts.maxDepth) {
+        queue.push({ dir: fullPath, depth: item.depth + 1 });
+      }
     }
   }
 }

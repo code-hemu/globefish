@@ -30,6 +30,7 @@
 - **Async API** - `glob()` returns a `Promise<string[]>` for modern async/await workflows
 - **Sync API** - `globSync()` provides a synchronous alternative when async is not suitable
 - **Streaming API** - `globStream()` yields results as they are discovered, without buffering all results in memory
+- **Concurrent traversal** - the `concurrency` option controls directory read parallelism for optimal I/O on SSDs and network drives
 
 
 ## Installation

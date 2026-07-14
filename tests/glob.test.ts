@@ -94,6 +94,15 @@ describe("glob integration", () => {
     const withDups = await glob(["**/*.ts", "src/**"], { cwd: dir, nounique: true });
     expect(unique.length).toBeLessThanOrEqual(withDups.length);
   });
+
+  it("supports concurrency option", async () => {
+    const dir = createTempDir();
+    const files = await glob("**/*.ts", { cwd: dir, concurrency: 4 });
+    expect(files).toContain("src/index.ts");
+    expect(files).toContain("tests/glob.test.ts");
+    expect(files).toContain("src/utils/path.ts");
+    expect(files).toHaveLength(3);
+  });
 });
 
 describe("globSync", () => {
@@ -146,5 +155,15 @@ describe("globStream", () => {
     }
     expect(results).toContain("src/index.ts");
     expect(results).not.toContain("tests/glob.test.ts");
+  });
+
+  it("works with concurrency option", async () => {
+    const dir = createTempDir();
+    const results: string[] = [];
+    for await (const file of globStream("**/*.ts", { cwd: dir, concurrency: 8 })) {
+      results.push(file);
+    }
+    expect(results).toContain("src/index.ts");
+    expect(results).toContain("tests/glob.test.ts");
   });
 });

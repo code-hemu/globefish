@@ -12,6 +12,7 @@ export type GlobOptions = {
   markDirectories?: boolean;
   nosort?: boolean;
   nounique?: boolean;
+  concurrency?: number;
 };
 
 export type GlobEntry = {

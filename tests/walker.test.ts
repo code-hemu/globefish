@@ -22,4 +22,14 @@ describe("walkTree", () => {
     expect(entries).toContain("a/1.txt");
     expect(entries).toContain("a/b/2.txt");
   });
+
+  it("walks with high concurrency", async () => {
+    const dir = createTempDir();
+    const entries: string[] = [];
+    for await (const entry of walkTree(dir, { concurrency: 16 })) {
+      entries.push(entry.path);
+    }
+    expect(entries).toContain("a/1.txt");
+    expect(entries).toContain("a/b/2.txt");
+  });
 });

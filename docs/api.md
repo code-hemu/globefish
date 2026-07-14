@@ -29,9 +29,8 @@ function glob(
 
 ### Returns
 
-`Promise<string[]>` — resolved file paths relative to `cwd` (or absolute when `options.absolute` is `true`). Paths are de-duplicated and sorted.
+`Promise<string[]>` - resolved file paths relative to `cwd` (or absolute when `options.absolute` is `true`). Paths are de-duplicated and sorted.
 
----
 
 ## `globSync(patterns, options?)`
 
@@ -52,7 +51,6 @@ function globSync(
 ): string[];
 ```
 
----
 
 ## `globStream(patterns, options?)`
 
@@ -75,7 +73,6 @@ function globStream(
 ): AsyncGenerator<string>;
 ```
 
----
 
 ## `GlobOptions`
 
@@ -108,6 +105,7 @@ type GlobOptions = {
 | `markDirectories` | `boolean` | `false` | When `true`, directory paths are suffixed with `/`. |
 | `nosort` | `boolean` | `false` | When `true`, result paths are returned in filesystem discovery order instead of sorted alphabetically. |
 | `nounique` | `boolean` | `false` | When `true`, duplicate paths are not removed from results. |
+| `concurrency` | `number` | `1` | Maximum number of directories to traverse in parallel. Higher values can improve performance on SSDs and network filesystems. |
 
 ### `onlyFiles` / `onlyDirectories`
 
@@ -121,7 +119,16 @@ By default, results are sorted alphabetically. Setting `nosort: true` skips sort
 
 By default, duplicate paths are removed. Setting `nounique: true` preserves duplicates, which may occur when multiple patterns match the same file.
 
----
+### `concurrency`
+
+Controls how many directories are read in parallel during filesystem traversal. The default `1` processes one directory at a time (serial). Setting a higher value (e.g., `16`, `64`) can improve performance on fast SSDs or network filesystems by overlapping I/O operations.
+
+```ts
+const files = await glob("**/*.ts", { concurrency: 16 });
+```
+
+Higher concurrency is not always better - it depends on your storage device and the directory structure. Experiment with values between `4` and `64` to find the sweet spot.
+
 
 ## `GlobEntry`
 
@@ -134,7 +141,6 @@ type GlobEntry = {
 
 Reserved for a future streaming/event-based API. The `glob()` function currently returns `string[]`.
 
----
 
 ## Pattern Syntax
 
@@ -147,7 +153,7 @@ glob("file\\.txt")     → matches "file.txt"
 glob("file.txt")       → matches "file.txt" (dot is literal outside char classes)
 ```
 
-### `*` — Wildcard
+### `*` - Wildcard
 
 Matches any sequence of characters **except** `/` and a leading dot (when `dot` is `false`).
 
@@ -156,7 +162,7 @@ glob("*.ts")           → matches "index.ts", not "src/index.ts"
 glob("src/*.ts")       → matches "src/index.ts", not "src/util/path.ts"
 ```
 
-### `**` — Globstar
+### `**` - Globstar
 
 Matches zero or more directories across path segments.
 
@@ -166,7 +172,7 @@ glob("**/*.ts")        → matches all .ts files anywhere
 glob("a/**/b")         → matches "a/b", "a/x/b", "a/x/y/b"
 ```
 
-### `?` — Single Character
+### `?` - Single Character
 
 Matches exactly one character (except `/` and a leading dot when `dot` is `false`).
 
@@ -175,7 +181,7 @@ glob("?.ts")           → matches "a.ts", not "ab.ts"
 glob("file-?.txt")     → matches "file-1.txt", "file-a.txt"
 ```
 
-### `[abc]` — Character Class
+### `[abc]` - Character Class
 
 Matches any one character from the enclosed set. Supports ranges (`[a-z]`) and negation (`[!abc]` or `[^abc]`).
 
@@ -185,7 +191,7 @@ glob("[a-z].ts")       → matches "a.ts" … "z.ts"
 glob("[!a-z].ts")      → matches "1.ts", but not "a.ts"
 ```
 
-### `{a,b}` — Brace Expansion
+### `{a,b}` - Brace Expansion
 
 Expands into multiple patterns. Supports nesting and empty alternatives.
 
@@ -197,7 +203,7 @@ glob("file{,.min}.js") → matches "file.js" and "file.min.js"
 
 Escaped braces `\{` `\}` are treated as literal characters and not expanded.
 
-### Extended Globs — `?(...)` `*(...)` `+(...)` `@(...)` `!(...)`
+### Extended Globs - `?(...)` `*(...)` `+(...)` `@(...)` `!(...)`
 
 Extended glob patterns allow matching based on repetition and grouping within a path segment.
 
@@ -225,7 +231,7 @@ glob("?(!(*.ts))")     → matches "a.js", not "a.ts"
 
 ### Glob-Level Negation
 
-When a pattern in a pattern array starts with `!`, it excludes matching paths. Later patterns override earlier ones — a positive pattern after a negation re-includes files.
+When a pattern in a pattern array starts with `!`, it excludes matching paths. Later patterns override earlier ones - a positive pattern after a negation re-includes files.
 
 ```
 glob(["**/*.ts", "!tests/**"])             → matches "src/index.ts", not "tests/glob.test.ts"
@@ -235,7 +241,6 @@ glob(["!!secret.ts"])                       → double negation: includes only "
 
 This is different from the `!(...)` extended glob, which is a pattern construct within a path segment.
 
----
 
 ## Ignore Patterns
 
@@ -256,7 +261,6 @@ Ignore pattern rules:
 - Trailing `/` applies the rule only to directories (and their children)
 - Leading `/` anchors the pattern to the root of the cwd
 
----
 
 ## Error Types
 
@@ -274,11 +278,10 @@ try {
 }
 ```
 
-- **`GlobError`** — Base error for all glob-related errors
-- **`PatternSyntaxError`** — Thrown when a pattern has invalid syntax (unclosed braces, unclosed char classes, unclosed extglob groups)
-- **`WalkError`** — Filesystem walk errors (reserved, not currently thrown)
+- **`GlobError`** - Base error for all glob-related errors
+- **`PatternSyntaxError`** - Thrown when a pattern has invalid syntax (unclosed braces, unclosed char classes, unclosed extglob groups)
+- **`WalkError`** - Filesystem walk errors (reserved, not currently thrown)
 
----
 
 ## Examples
 
@@ -318,7 +321,6 @@ for await (const file of globStream("**/*.ts", { ignore: ["node_modules/**"] }))
 }
 ```
 
----
 
 ## Low-level APIs
 

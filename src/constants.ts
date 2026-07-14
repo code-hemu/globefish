@@ -16,4 +16,5 @@ export const DEFAULT_OPTIONS: Required<GlobOptions> = {
   markDirectories: false,
   nosort: false,
   nounique: false,
+  concurrency: 1,
 };
